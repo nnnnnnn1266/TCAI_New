@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TCAI - Turtle Care AI</title>
+    <style>
+      :root {
+        font-family: Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: #f5fbff;
+        color: #123;
+      }
+      .container {
+        max-width: 760px;
+        margin: 4rem auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      textarea {
+        width: 100%;
+        min-height: 110px;
+        font-size: 1rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+      }
+      button {
+        margin-top: 0.75rem;
+        background: #0ea5e9;
+        color: white;
+        border: none;
+        padding: 0.7rem 1.1rem;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0284c7;
+      }
+      #answer {
+        margin-top: 1.2rem;
+        white-space: pre-wrap;
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 0.9rem;
+      }
+      .muted {
+        color: #475569;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🐢 TCAI (Turtle Care AI)</h1>
+      <p class="muted">Ask a turtle-care question. This demo currently uses a mock inference service.</p>
+
+      <textarea id="question" placeholder="Example: Why do turtles bask?"></textarea>
+      <br />
+      <button id="askBtn">Ask</button>
+
+      <div id="answer">Your answer will appear here.</div>
+    </div>
+
+    <script>
+      const askBtn = document.getElementById("askBtn");
+      const questionInput = document.getElementById("question");
+      const answerBox = document.getElementById("answer");
+
+      async function askQuestion() {
+        const question = questionInput.value.trim();
+        if (!question) {
+          answerBox.textContent = "Please enter a question first.";
+          return;
+        }
+
+        answerBox.textContent = "Thinking...";
+
+        try {
+          const response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question })
+          });
+
+          if (!response.ok) {
+            const errorPayload = await response.json();
+            answerBox.textContent = `Error: ${JSON.stringify(errorPayload)}`;
+            return;
+          }
+
+          const payload = await response.json();
+          answerBox.textContent = payload.answer;
+        } catch (error) {
+          answerBox.textContent = `Request failed: ${error}`;
+        }
+      }
+
+      askBtn.addEventListener("click", askQuestion);
+    </script>
+  </body>
+</html>
